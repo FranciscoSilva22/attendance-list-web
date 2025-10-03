@@ -3,8 +3,9 @@ import { login } from "@/store/auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { Toast } from 'primereact/toast';
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { AxiosError } from "axios";
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -12,10 +13,13 @@ const Login = () => {
     const token = useSelector<Store>((state) => state.auth.token);
     const toast = useRef<Toast>(null);
 
+    const [loading, setLoading] = useState(false);
+
     if(token)
         navigate({to: "/"});
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+        setLoading(true);
         e.preventDefault();
         
         const form = e.currentTarget;
@@ -40,6 +44,8 @@ const Login = () => {
             else
                 toast.current?.show({ severity: 'error', summary: 'Erro no login', detail: 'Contate o suporte' });
         }
+
+        setLoading(false);
     }
 
     return (
@@ -50,7 +56,11 @@ const Login = () => {
                     <input name="username" className="w-[80%] bg-[#FBFCFF] mb-5 p-5 rounded-sm" placeholder="Usuário" type="text" />
                     <input name="password" className="w-[80%] bg-[#FBFCFF] p-5 rounded-sm" placeholder="Senha" type="password" />
 
-                    <input className="cursor-pointer mt-6 bg-[#41BBD9] w-[80%] p-3 rounded-md text-[#FBFCFF] font-bold border-1 border-[#D0CCD0]" type="submit" value="Entrar" />
+                    <button type="submit" disabled={loading} className="cursor-pointer mt-6 bg-[#41BBD9] w-[80%] p-3 rounded-md text-[#FBFCFF] font-bold border-1 border-[#D0CCD0]">
+                        {
+                            loading ? <ProgressSpinner style={{ width: 25, height: 25 }} strokeWidth="8" /> : "Entrar"
+                        }
+                    </button>
                 </form>
             </div>
         </div>

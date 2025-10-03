@@ -3,6 +3,7 @@ import api from "@/services/api";
 import { useMemo, useRef, useState } from "react";
 import { InputMask } from 'primereact/inputmask';
 import { Toast } from 'primereact/toast';
+import { ProgressSpinner } from "primereact/progressspinner";
 
 interface ModalProps {
     open: boolean;
@@ -16,7 +17,10 @@ const Modal: React.FC<ModalProps> = ({ open, handleClose, handlePresence, editRe
     const [continueRegister, setContinueRegister] = useState(true);
     const toast = useRef<Toast>(null);
 
+    const [loading, setLoading] = useState(false);
+
     const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
+        setLoading(true);
         e.preventDefault();
         
         const form = e.currentTarget;
@@ -51,6 +55,8 @@ const Modal: React.FC<ModalProps> = ({ open, handleClose, handlePresence, editRe
         form.reset();
         if(!continueRegister)
             handleClose();
+
+        setLoading(false);
     }
 
     const modalClasses = useMemo(() => {
@@ -101,11 +107,14 @@ const Modal: React.FC<ModalProps> = ({ open, handleClose, handlePresence, editRe
                         <label htmlFor="chk-continue">Continuar Registrando?</label>
                     </div>
 
-                    <input
-                        className="cursor-pointer mt-6 bg-[#17C3B2] w-[80%] p-2 rounded-md text-[#FBFCFF] font-bold border-2 border-[#D0CCD0]"
+                    <button
                         type="submit"
-                        value="Registrar"
-                    />
+                        className="cursor-pointer mt-6 bg-[#17C3B2] w-[80%] p-2 rounded-md text-[#FBFCFF] font-bold border-2 border-[#D0CCD0]"
+                    >
+                        {
+                            loading ? <ProgressSpinner style={{ width: 25, height: 25 }} strokeWidth="8" /> : "Registrar"
+                        }
+                    </button>
                 </form>
             </div>
         </div>

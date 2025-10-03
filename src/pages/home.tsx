@@ -5,6 +5,7 @@ import { useAppSelector } from "@/hooks/redux";
 import api from "@/services/api";
 import { logout } from "@/store/auth";
 import { useNavigate } from "@tanstack/react-router";
+import { Message } from "primereact/message";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -12,6 +13,8 @@ const Home = () => {
     const { token, user } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const [loading, setLoading] = useState(true);
 
     if(!token)
         navigate({to: "/login"});
@@ -21,6 +24,7 @@ const Home = () => {
     const [editRegister, setEditRegister] = useState<Presence | null>(null);
 
     async function getPresenceList() {
+        setLoading(true);
         try {
             let route = "presence";
 
@@ -37,6 +41,7 @@ const Home = () => {
         } catch (error) {
             console.log(error);
         }
+        setLoading(false);
     }
 
     async function removePeople(id: number) {
@@ -105,15 +110,23 @@ const Home = () => {
                 </div>
 
                 {
-                    user?.isAdmin
-                        ? <AdminList
-                                presences={presences as unknown as PresenceList}
-                            />
-                        : <List
-                            presences={presences}
-                            editRegister={handleEdit}
-                            removeRegister={removePeople}
-                        />
+                    loading
+                        ? <Message severity="info" text="Carregando..." />
+                        : (
+                            <>
+                                {
+                                    user?.isAdmin
+                                        ? <AdminList
+                                                presences={presences as unknown as PresenceList}
+                                            />
+                                        : <List
+                                            presences={presences}
+                                            editRegister={handleEdit}
+                                            removeRegister={removePeople}
+                                        />
+                                }
+                            </>
+                        )
                 }
             </div>
         </div>
